@@ -1,0 +1,30 @@
+name: askci-term-ci
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches_ignore: []
+
+jobs:
+  testing:
+    runs-on: ubuntu-latest
+    needs: formatting
+    steps:
+      - uses: actions/checkout@v1
+      
+      - name: Setup OpenContainers Python environment
+        run: |
+            conda create --quiet --name askci
+            conda install beautifulsoup4
+
+      - name: Run tests
+        run: |
+
+          # activate conda env
+          export PATH="/usr/share/miniconda/bin:$PATH"
+          source activate askci
+          
+          # run tests
+          python .github/workflow/test_markdown.py
