@@ -48,9 +48,14 @@ create_pull_request() {
     SOURCE="${1}"  # from this branch
     TARGET="${2}"  # pull request TO this target
 
-    # Check if the branch already has a pull request open
-    TITLE='Request for Term Update Review'
-    BODY='This is a pull request to request review for changes to the term README.md.'
+    # The calling function can export the title or body
+    if [ -z "${TITLE}" ]; then
+        TITLE="'Request for Term Update Review'"
+    fi
+    if [ -z "${BODY}" ]; then
+        BODY='This is a pull request to request review for changes to the term README.md.'
+    fi
+
     DATA="{\"base\":\"${TARGET}\", \"head\":\"${SOURCE}\", \"body\":\"${BODY}\"}"
     RESPONSE=$(curl -sSL -H "${AUTH_HEADER}" -H "${HEADER}" --user "${GITHUB_ACTOR}" -X GET --data "${DATA}" ${PULLS_URL})
     PR=$(echo "${RESPONSE}" | jq --raw-output '.[] | .head.ref')
