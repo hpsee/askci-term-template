@@ -35,7 +35,7 @@ with open(readme, 'r') as filey:
 soup = BeautifulSoup(html, "lxml")
 
 # Supported span prefixes
-prefixes = ["question"]
+prefixes = ["question", "example"]
 prefix_regex = "^(%s)" % "|".join(prefixes)
 
 # Ensure that each span is all lowercase, with no extra characters
