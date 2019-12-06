@@ -41,7 +41,7 @@ jobs:
           export BRANCH_FROM="update/term-${USERNAME}-$(date '+%Y-%m-%d')"
           /bin/bash .github/workflows/pull-request.sh;
           if [ -f "PR_RESPONSE.json" ]; then
-            URL=$(jq --raw-output .url "PR_RESPONSE.json");
+            URL=$(jq --raw-output .html_url "PR_RESPONSE.json");
             TITLE=$(jq --raw-output .title "PR_RESPONSE.json");
             PR_ID=$(jq --raw-output .client_payload.id "${GITHUB_EVENT_PATH}");
             RESPONSE_URL=$(jq --raw-output .client_payload.url "${GITHUB_EVENT_PATH}");
