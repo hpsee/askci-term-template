@@ -10,14 +10,15 @@ jobs:
     steps:
     - name: Checkout Code
       uses: actions/checkout@v1
-    - name: Update README.md
+    - name: Update Template via Pull Request
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        UPSTREAM: "hpsee/askci-template-term"
+        TEMPLATE_REPO: hpsee/askci-template-term
+        EVENT_NAME: update-template
+        BRANCH_AGAINST: "master"
       run: |
-        # Only run if the dispatch event is to update from the upstream template
-        update_template=$(jq --raw-output .client_payload.update_template "${GITHUB_EVENT_PATH}")
-        if [ "${update_template}" == null ]; then
+        event_name=$(jq --raw-output .client_payload.event_name "${GITHUB_EVENT_PATH}")
+        if [ "${event_name}" != "${EVENT_NAME}" ]; then
             echo "Dispatch Event is not intended to update template"
             exit 0;
         fi
@@ -26,28 +27,21 @@ jobs:
             echo "This is the upstream, will not edit."
             exit 0;
         fi
-        # Move current README.md before pulling from upstream
-        mv README.md _README.md
-        git remote set-url upstream "https://x-access-token:${GITHUB_TOKEN}@github.com/${UPSTREAM}.git"
-        git pull upstream master
-        mv _README.md README.md
-        # Open pull request to update template
-        echo "GitHub Actor: ${GITHUB_ACTOR}"
-        git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-        git branch
-        git checkout -b update/template-$(date '+%Y-%m-%d')
-        git branch
-        git config --global user.name "github-actions"
-        git config --global user.email "github-actions@users.noreply.github.com"
-        git add *
-        git commit -m "Update of upstream template $(date '+%Y-%m-%d')" --allow-empty
-        git push origin update/template-$(date '+%Y-%m-%d')
-    - name: Open pull request
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        BRANCH_AGAINST: "master"
-      run: |
-          export BRANCH_FROM="update/template-$(date '+%Y-%m-%d')"
-          export TITLE="Update of upstream knowledge repository template"
-          export BODY="This is a pull request to update the upstream template."
-          /bin/bash .github/workflows/pull-request.sh;
+        # Checkout template to tmp, move files
+        git clone "${TEMPLATE_REPO}" /tmp/template
+        cp -R /tmp/template/.github .github/
+        # Open pull request to update template;
+        echo "GitHub Actor: ${GITHUB_ACTOR}";
+        export BRANCH_FROM="update/template-$(date '+%Y-%m-%d')";
+        export TITLE="Update of upstream knowledge repository template";
+        export BODY="This is a pull request to update the upstream template.";
+        git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git";
+        git branch;
+        git checkout -b "${BRANCH_FROM}";
+        git branch;
+        git config --global user.name "github-actions";
+        git config --global user.email "github-actions@users.noreply.github.com";
+        git add *;
+        git commit -m "Update from template ${TEMPLATE_REPO} $(date '+%Y-%m-%d')" --allow-empty;
+        git push origin "${BRANCH_FROM}";
+        /bin/bash .github/workflows/pull-request.sh;
