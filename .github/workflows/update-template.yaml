@@ -33,8 +33,6 @@ jobs:
         # Open pull request to update template;
         echo "GitHub Actor: ${GITHUB_ACTOR}";
         export BRANCH_FROM="update/template-$(date '+%Y-%m-%d')";
-        export TITLE="Update of upstream knowledge repository template";
-        export BODY="This is a pull request to update the upstream template.";
         git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git";
         git branch;
         git checkout -b "${BRANCH_FROM}";
@@ -44,4 +42,4 @@ jobs:
         git add *;
         git commit -m "Update from template ${TEMPLATE_REPO} $(date '+%Y-%m-%d')" --allow-empty;
         git push origin "${BRANCH_FROM}";
-        /bin/bash .github/workflows/pull-request.sh;
+        /bin/bash .github/workflows/update-template.sh;
