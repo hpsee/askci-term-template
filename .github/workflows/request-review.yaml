@@ -17,25 +17,9 @@ jobs:
     - name: Checkout Branch and Open Pull Request
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        BRANCH_AGAINST: "master"
+        BRANCH_AGAINST: master
         EVENT_NAME: request-review
       run: |
-        event_name=$(jq --raw-output .client_payload.event_name "${GITHUB_EVENT_PATH}")
-        if [ "${event_name}" != "${EVENT_NAME}" ]; then
-            echo "Dispatch Event is not intended to update template"
-            exit 0;
-        fi
-        USERNAME=$(jq --raw-output .client_payload.username "${GITHUB_EVENT_PATH}");
-        export BRANCH_FROM="update/term-${USERNAME}-$(date '+%Y-%m-%d')";
-        echo "Requested by ${USERNAME}";
-        echo "GitHub Actor: ${GITHUB_ACTOR}";
-        git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git";
-        git branch;
-        git checkout -b "${BRANCH_FROM}";
-        git branch;
-        git config --global user.name "github-actions";
-        git config --global user.email "github-actions@users.noreply.github.com";
-        git add README.md;
-        git commit -m "Request review of term by ${USERNAME} $(date '+%Y-%m-%d')" --allow-empty;
-        git push origin "${BRANCH_FROM}";
+        export EVENT_NAME;
+        export BRANCH_AGAINST;
         /bin/bash .github/pull-request.sh;

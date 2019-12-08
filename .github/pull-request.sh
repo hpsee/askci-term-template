@@ -20,6 +20,30 @@ REPO_URL="${BASE}/repos/${GITHUB_REPOSITORY}"
 PULLS_URL=$REPO_URL/pulls
 
 ################################################################################
+# Get Markdown from the Payload for new Branch
+################################################################################
+
+event_name=$(jq --raw-output .client_payload.event_name "${GITHUB_EVENT_PATH}")
+if [ "${event_name}" != "${EVENT_NAME}" ]; then
+    echo "Dispatch Event is not intended to update template"
+    exit 0;
+fi
+USERNAME=$(jq --raw-output .client_payload.username "${GITHUB_EVENT_PATH}");
+TEMPLATE_FILES=$(jq --raw-output .client_payload.files "${GITHUB_EVENT_PATH}");
+export BRANCH_FROM="update/term-${USERNAME}-$(date '+%Y-%m-%d')";
+echo "Requested by ${USERNAME}";
+echo "GitHub Actor: ${GITHUB_ACTOR}";
+git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git";
+git branch;
+git checkout -b "${BRANCH_FROM}";
+git branch;
+git config --global user.name "github-actions";
+git config --global user.email "github-actions@users.noreply.github.com";
+git add "${TEMPLATE_FILES}";
+git commit -m "Request review of term by ${USERNAME} $(date '+%Y-%m-%d')" --allow-empty;
+git push origin "${BRANCH_FROM}";
+
+################################################################################
 # Helper Functions
 ################################################################################
 
