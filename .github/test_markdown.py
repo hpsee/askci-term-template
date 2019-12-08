@@ -18,7 +18,7 @@ import re
 import sys
 
 # The README.md must exist
-root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 print('Root of repository is %s' % root)
 
 readme = os.path.join(root, 'README.md')
