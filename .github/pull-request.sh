@@ -74,7 +74,7 @@ create_pull_request() {
 
     # The calling function can export the title or body
     if [ -z "${TITLE}" ]; then
-        TITLE="'Request for Term Update Review'"
+        TITLE="Request for Term Update Review"
     fi
     if [ -z "${BODY}" ]; then
         BODY='This is a pull request to request review for changes to the term README.md.'
