@@ -38,4 +38,4 @@ jobs:
         git add README.md;
         git commit -m "Request review of term by ${USERNAME} $(date '+%Y-%m-%d')" --allow-empty;
         git push origin "${BRANCH_FROM}";
-        /bin/bash .github/workflows/pull-request.sh;
+        /bin/bash .github/pull-request.sh;
